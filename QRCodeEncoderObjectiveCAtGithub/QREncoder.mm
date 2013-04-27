@@ -84,7 +84,17 @@
     return matrix;
 }
 
++ (UIImage*)renderTransparentDataMatrix:(DataMatrix*)matrix imageDimension:(int)imageDimension {
+    const uint32_t transp = 0x00FFFFFF;
+    return [[self class] renderDataMatrix: matrix imageDimension: imageDimension withBackgroundColor: transp];
+}
+
 + (UIImage*)renderDataMatrix:(DataMatrix*)matrix imageDimension:(int)imageDimension {
+    const uint32_t white = 0xFFFFFFFF;
+    return [[self class] renderDataMatrix: matrix imageDimension: imageDimension withBackgroundColor: white];
+}
+
++ (UIImage*)renderDataMatrix:(DataMatrix*)matrix imageDimension:(int)imageDimension withBackgroundColor: (uint32_t) backgroundColor{
     
     const int bitsPerPixel = BITS_PER_BYTE * BYTES_PER_PIXEL;
     const int bytesPerLine = BYTES_PER_PIXEL * imageDimension;
@@ -97,7 +107,7 @@
     int offsetBottomAndRight = (imageDimension - pixelPerDot * matrixDimension - offsetTopAndLeft);
     
     // alpha, blue, green, red
-    const uint32_t white = 0xFFFFFFFF, black = 0xFF000000, transp = 0x00FFFFFF;
+    const uint32_t black = 0xFF000000, transp = 0x00FFFFFF;
     
     uint32_t *ptrData = (uint32_t *)rawData;
     // top offset
@@ -111,7 +121,7 @@
             *(ptrData++) = transp;
         
         for(int mx=0; mx<matrixDimension; mx++) {
-            uint32_t clr = [matrix valueAt:mx y:my] ? black : white;
+            uint32_t clr = [matrix valueAt:mx y:my] ? black : backgroundColor;
             // draw one pixel line of data
             for(int c=pixelPerDot; c>0; c--) 
                 *(ptrData++) = clr;
